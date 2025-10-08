@@ -57,17 +57,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body>
 
     <nav class="navbar">
-        <a href="/index.php" style="font-weight: bold;">Bilet Platformu</a>
-        <div>
-            <?php if (isset($_SESSION['user_id'])): ?>
-                <span>Hoş geldiniz, <?php echo htmlspecialchars($_SESSION['user_name']); ?>!</span>
-                <a href="/index.php?action=logout">Çıkış Yap</a>
-            <?php else: ?>
-                <a href="/index.php?page=login">Giriş Yap</a>
-                <a href="/index.php?page=register">Kayıt Ol</a>
-            <?php endif; ?>
-        </div>
-    </nav>
+    <a href="/index.php" style="font-weight: bold;">Bilet Platformu</a>
+    <div>
+        <?php if (isset($_SESSION['user_id'])): ?>
+            <span>Hoş geldiniz, <?php echo htmlspecialchars($_SESSION['user_name']); ?>!</span>
+            <a href="/index.php?page=my-tickets">Biletlerim</a>
+            <a href="/index.php?action=logout">Çıkış Yap</a>
+        <?php else: ?>
+            <a href="/index.php?page=login">Giriş Yap</a>
+            <a href="/index.php?page=register">Kayıt Ol</a>
+        <?php endif; ?>
+    </div>
+</nav>
 
     <div class="container">
         <h1>Otobüs Seferi Ara</h1>
