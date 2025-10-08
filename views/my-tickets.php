@@ -59,12 +59,21 @@ $my_tickets = $stmt->fetchAll();
     </nav>
     <div class="container">
         <h1>Biletlerim</h1>
-
-        <?php if (isset($_GET['status']) && $_GET['status'] == 'purchase_success'): ?>
+        <?php if (isset($_GET['status']) && $_GET['status'] == 'cancel_success'): ?>
             <div class="alert-success">
-                Bilet satın alma işleminiz başarıyla tamamlandı!
+                Biletiniz başarıyla iptal edildi ve ücreti hesabınıza iade edildi.
             </div>
-        <?php endif; ?>
+            <?php endif; ?>
+            <?php if (isset($_GET['error'])): ?>
+                <div class="alert-danger" style="color: #721c24; background-color: #f8d7da; padding: 1rem; border-radius: .25rem; margin-bottom: 1rem;">
+                    <?php echo htmlspecialchars($_GET['error']); ?>
+                </div>
+                <?php endif; ?>
+                <?php if (isset($_GET['status']) && $_GET['status'] == 'purchase_success'): ?>
+                    <div class="alert-success">
+                        Bilet satın alma işleminiz başarıyla tamamlandı!
+                    </div>
+                    <?php endif; ?>
 
         <?php if (empty($my_tickets)): ?>
             <p>Henüz satın alınmış biletiniz bulunmamaktadır.</p>
@@ -79,7 +88,7 @@ $my_tickets = $stmt->fetchAll();
                         <p><strong>Satın Alınma Tarihi:</strong> <?php echo date('d M Y H:i', strtotime($ticket['purchase_time'])); ?></p>
                     </div>
                     <div class="ticket-actions">
-                        <a href="#" class="btn btn-danger">İptal Et</a>
+                        <a href="/index.php?action=cancel_ticket&ticket_id=<?php echo $ticket['ticket_id']; ?>" class="btn btn-danger" onclick="return confirm('Bu bileti iptal etmek istediğinizden emin misiniz? Ücreti hesabınıza iade edilecektir.');">İptal Et</a>
                         <a href="#" class="btn btn-secondary">PDF İndir</a>
                     </div>
                 </div>

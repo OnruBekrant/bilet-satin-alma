@@ -16,6 +16,8 @@ if (isset($_GET['action'])) {
         require_once __DIR__ . '/../controllers/auth_controller.php';
     } elseif ($action === 'purchase') {
         require_once __DIR__ . '/../controllers/purchase_controller.php';
+    } elseif ($action === 'cancel_ticket') { // YENİ EYLEM
+        require_once __DIR__ . '/../controllers/ticket_controller.php';
     }
 }
 
