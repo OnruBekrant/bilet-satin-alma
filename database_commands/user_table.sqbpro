@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="/media/gamedisk/root/code/bilet-satin-alma/database/bilet_platformu.sqlite" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="browser structure pragmas query" current="0"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="2435"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><current_table name="4,7:maincoupons"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="companies" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="41"/><column index="2" value="41"/><column index="3" value="73"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="coupons" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="41"/><column index="2" value="41"/><column index="3" value="93"/><column index="4" value="79"/><column index="5" value="80"/><column index="6" value="73"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="sqlite_sequence" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="41"/><column index="2" value="41"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="tickets" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="41"/><column index="2" value="51"/><column index="3" value="46"/><column index="4" value="89"/><column index="5" value="99"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="trips" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="41"/><column index="2" value="81"/><column index="3" value="128"/><column index="4" value="105"/><column index="5" value="105"/><column index="6" value="83"/><column index="7" value="75"/><column index="8" value="41"/><column index="9" value="73"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="users" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="41"/><column index="2" value="41"/><column index="3" value="41"/><column index="4" value="66"/><column index="5" value="42"/><column index="6" value="41"/><column index="7" value="81"/><column index="8" value="73"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="user_table.txt">CREATE TABLE &quot;users&quot; (
+	&quot;id&quot;	INTEGER PRIMARY KEY AUTOINCREMENT,
+	&quot;name&quot;	TEXT NOT NULL,
+	&quot;email&quot;	TEXT NOT NULL UNIQUE,
+	&quot;password&quot;	TEXT NOT NULL,
+	&quot;credit&quot;	REAL DEFAULT 0.0,
+	&quot;role&quot;	TEXT NOT NULL DEFAULT 'user',
+	&quot;company_id&quot;	INTEGER,
+	&quot;created_at&quot;	TEXT DEFAULT CURRENT_TIMESTAMP
+);</sql><sql name="companies_table.txt">CREATE TABLE &quot;companies&quot; (
+	&quot;id&quot;	INTEGER PRIMARY KEY AUTOINCREMENT,
+	&quot;name&quot;	TEXT NOT NULL UNIQUE,
+	&quot;created_at&quot;	TEXT DEFAULT CURRENT_TIMESTAMP
+);</sql><sql name="trips_table.txt">CREATE TABLE &quot;trips&quot; (
+	&quot;id&quot;	INTEGER PRIMARY KEY AUTOINCREMENT,
+	&quot;company_id&quot;	INTEGER NOT NULL,
+	&quot;departure_location&quot;	TEXT NOT NULL,
+	&quot;arrival_location&quot;	TEXT NOT NULL,
+	&quot;departure_time&quot;	TEXT NOT NULL,
+	&quot;arrival_time&quot;	TEXT NOT NULL,
+	&quot;seat_count&quot;	INTEGER NOT NULL,
+	&quot;price&quot;	REAL NOT NULL,
+	&quot;created_at&quot;	TEXT DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY(&quot;company_id&quot;) REFERENCES &quot;companies&quot;(&quot;id&quot;)
+);</sql><sql name="tickets_table.txt">CREATE TABLE &quot;tickets&quot; (
+	&quot;id&quot;	INTEGER PRIMARY KEY AUTOINCREMENT,
+	&quot;user_id&quot;	INTEGER NOT NULL,
+	&quot;trip_id&quot;	INTEGER NOT NULL,
+	&quot;seat_number&quot;	INTEGER NOT NULL,
+	&quot;purchase_time&quot;	TEXT DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY(&quot;user_id&quot;) REFERENCES &quot;users&quot;(&quot;id&quot;),
+	FOREIGN KEY(&quot;trip_id&quot;) REFERENCES &quot;trips&quot;(&quot;id&quot;)
+);</sql><sql name="coupons_table.txt">CREATE TABLE &quot;coupons&quot; (
+	&quot;id&quot;	INTEGER PRIMARY KEY AUTOINCREMENT,
+	&quot;code&quot;	TEXT NOT NULL UNIQUE,
+	&quot;discount_rate&quot;	INTEGER NOT NULL,
+	&quot;usage_limit&quot;	INTEGER NOT NULL,
+	&quot;expire_date&quot;	TEXT NOT NULL,
+	&quot;created_at&quot;	TEXT DEFAULT CURRENT_TIMESTAMP
+);</sql><current_tab id="4"/></tab_sql></sqlb_project>

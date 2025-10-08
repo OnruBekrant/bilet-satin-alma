@@ -1,0 +1,8 @@
+CREATE TABLE "coupons" (
+	"id"	INTEGER PRIMARY KEY AUTOINCREMENT,
+	"code"	TEXT NOT NULL UNIQUE,
+	"discount_rate"	INTEGER NOT NULL,
+	"usage_limit"	INTEGER NOT NULL,
+	"expire_date"	TEXT NOT NULL,
+	"created_at"	TEXT DEFAULT CURRENT_TIMESTAMP
+);

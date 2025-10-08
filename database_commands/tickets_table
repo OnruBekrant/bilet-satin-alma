@@ -1,0 +1,9 @@
+CREATE TABLE "tickets" (
+	"id"	INTEGER PRIMARY KEY AUTOINCREMENT,
+	"user_id"	INTEGER NOT NULL,
+	"trip_id"	INTEGER NOT NULL,
+	"seat_number"	INTEGER NOT NULL,
+	"purchase_time"	TEXT DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY("user_id") REFERENCES "users"("id"),
+	FOREIGN KEY("trip_id") REFERENCES "trips"("id")
+);

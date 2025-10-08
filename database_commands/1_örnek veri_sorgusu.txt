@@ -1,0 +1,10 @@
+-- Önce örnek bir otobüs firması ekleyelim.
+-- Bu firmanın ID'si otomatik olarak 1 olacaktır.
+INSERT INTO companies (name) VALUES ('Gemini Seyahat');
+
+-- Şimdi, ID'si 1 olan bu firmaya ait 3 adet sefer ekleyelim.
+INSERT INTO trips (company_id, departure_location, arrival_location, departure_time, arrival_time, seat_count, price) 
+VALUES 
+(1, 'İstanbul', 'Ankara', '2025-10-20 10:00:00', '2025-10-20 16:00:00', 40, 500),
+(1, 'Ankara', 'İzmir', '2025-10-21 12:00:00', '2025-10-21 20:00:00', 40, 650),
+(1, 'İstanbul', 'Ankara', '2025-10-20 14:00:00', '2025-10-20 20:00:00', 40, 550);

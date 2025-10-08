@@ -1,0 +1,12 @@
+CREATE TABLE "trips" (
+	"id"	INTEGER PRIMARY KEY AUTOINCREMENT,
+	"company_id"	INTEGER NOT NULL,
+	"departure_location"	TEXT NOT NULL,
+	"arrival_location"	TEXT NOT NULL,
+	"departure_time"	TEXT NOT NULL,
+	"arrival_time"	TEXT NOT NULL,
+	"seat_count"	INTEGER NOT NULL,
+	"price"	REAL NOT NULL,
+	"created_at"	TEXT DEFAULT CURRENT_TIMESTAMP,
+	FOREIGN KEY("company_id") REFERENCES "companies"("id")
+);
