@@ -4,6 +4,11 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 // ---------------------------
+
+// --- ZAMAN DİLİMİ AYARI ---
+date_default_timezone_set('Europe/Istanbul');
+// ---------------------------
+
 session_start(); // Session yönetimini her zaman en başta başlat
 
 // --- Eylem Kontrolcüsü (Action Controller) ---
