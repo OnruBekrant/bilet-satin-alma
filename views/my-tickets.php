@@ -89,7 +89,7 @@ $my_tickets = $stmt->fetchAll();
                     </div>
                     <div class="ticket-actions">
                         <a href="/index.php?action=cancel_ticket&ticket_id=<?php echo $ticket['ticket_id']; ?>" class="btn btn-danger" onclick="return confirm('Bu bileti iptal etmek istediğinizden emin misiniz? Ücreti hesabınıza iade edilecektir.');">İptal Et</a>
-                        <a href="#" class="btn btn-secondary">PDF İndir</a>
+                        <a href="/index.php?action=download_pdf&ticket_id=<?php echo $ticket['ticket_id']; ?>" class="btn btn-secondary" target="_blank">PDF İndir</a>
                     </div>
                 </div>
             <?php endforeach; ?>
