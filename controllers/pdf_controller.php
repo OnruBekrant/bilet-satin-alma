@@ -1,6 +1,6 @@
 <?php
 // Composer kütüphanelerini yükleyen sihirli satır. HER ZAMAN EN BAŞTA OLMALI!
-require __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../config/database.php';
 
 session_start();
@@ -46,23 +46,23 @@ $pdf->SetFont('Arial', 'B', 16);
 
 // Türkçe karakter sorunu yaşamamak için iconv kullanalım
 $company_name = iconv('UTF-8', 'ISO-8859-9//TRANSLIT', $ticket['company_name']);
-$title = iconv('UTF-8', 'ISO-8859-9//TRANSLIT', 'Yolcu Biniş Kartı');
+$title = iconv('UTF-8', 'ISO-8859-9//TRANSLIT', 'Yolcu Binis Karti');
 
 $pdf->Cell(0, 10, $company_name, 0, 1, 'C');
 $pdf->Cell(0, 10, $title, 0, 1, 'C');
 $pdf->Ln(10);
 
 $pdf->SetFont('Arial', '', 12);
-$pdf->Cell(40, 10, iconv('UTF-8', 'ISO-8859-9//TRANSLIT', 'Yolcu Adı:'), 0, 0);
+$pdf->Cell(40, 10, iconv('UTF-8', 'ISO-8859-9//TRANSLIT', 'Yolcu Adi:'), 0, 0);
 $pdf->Cell(0, 10, iconv('UTF-8', 'ISO-8859-9//TRANSLIT', $ticket['user_name']), 0, 1);
 
-$pdf->Cell(40, 10, iconv('UTF-8', 'ISO-8859-9//TRANSLIT', 'Kalkış:'), 0, 0);
+$pdf->Cell(40, 10, iconv('UTF-8', 'ISO-8859-9//TRANSLIT', 'Kalkis:'), 0, 0);
 $pdf->Cell(0, 10, iconv('UTF-8', 'ISO-8859-9//TRANSLIT', $ticket['departure_location']), 0, 1);
 
-$pdf->Cell(40, 10, iconv('UTF-8', 'ISO-8859-9//TRANSLIT', 'Varış:'), 0, 0);
+$pdf->Cell(40, 10, iconv('UTF-8', 'ISO-8859-9//TRANSLIT', 'Varis:'), 0, 0);
 $pdf->Cell(0, 10, iconv('UTF-8', 'ISO-8859-9//TRANSLIT', $ticket['arrival_location']), 0, 1);
 
-$pdf->Cell(40, 10, iconv('UTF-8', 'ISO-8859-9//TRANSLIT', 'Kalkış Saati:'), 0, 0);
+$pdf->Cell(40, 10, iconv('UTF-8', 'ISO-8859-9//TRANSLIT', 'Kalkis Saati:'), 0, 0);
 $pdf->Cell(0, 10, date('d.m.Y H:i', strtotime($ticket['departure_time'])), 0, 1);
 
 $pdf->Cell(40, 10, iconv('UTF-8', 'ISO-8859-9//TRANSLIT', 'Koltuk No:'), 0, 0);
