@@ -1,6 +1,7 @@
 {
     "require": {
-        "anouar/fpdf": "^2.0"
+        "anouar/fpdf": "^2.0",
+        "setasign/tfpdf": "^1.33"
     },
     "config": {
         "allow-plugins": {
