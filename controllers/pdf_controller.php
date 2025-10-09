@@ -1,5 +1,5 @@
 <?php
-// Composer kütüphanelerini yükleyen sihirli satır. HER ZAMAN EN BAŞTA OLMALI!
+// Composer kütüphanelerini yükleyen sihirli satır.
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../config/database.php';
 
@@ -39,37 +39,42 @@ if (!$ticket) {
     die("Bilet bulunamadı veya bu bileti görüntüleme yetkiniz yok.");
 }
 
-// PDF Oluşturma
-$pdf = new FPDF();
+// PDF Oluşturma (tFPDF ile)
+$pdf = new tFPDF();
 $pdf->AddPage();
-$pdf->SetFont('Arial', 'B', 16);
 
-// Türkçe karakter sorunu yaşamamak için iconv kullanalım
-$company_name = iconv('UTF-8', 'ISO-8859-9//TRANSLIT', $ticket['company_name']);
-$title = iconv('UTF-8', 'ISO-8859-9//TRANSLIT', 'Yolcu Binis Karti');
+// Türkçe karakterleri destekleyen bir font ekliyoruz.
+// tFPDF kütüphanesiyle gelen DejaVu fontunu kullanacağız.
+$pdf->AddFont('DejaVu', '', 'DejaVuSans.ttf', true);
+$pdf->AddFont('DejaVu', 'B', 'DejaVuSans-Bold.ttf', true);
 
-$pdf->Cell(0, 10, $company_name, 0, 1, 'C');
-$pdf->Cell(0, 10, $title, 0, 1, 'C');
+// Eklediğimiz fontu aktif hale getiriyoruz.
+$pdf->SetFont('DejaVu', 'B', 16);
+
+// EN BÜYÜK DEĞİŞİKLİK: Artık iconv() fonksiyonuna ihtiyacımız kalmadı!
+// Metinleri doğrudan UTF-8 olarak gönderebiliriz.
+$pdf->Cell(0, 10, $ticket['company_name'], 0, 1, 'C');
+$pdf->Cell(0, 10, 'Yolcu Biniş Kartı', 0, 1, 'C');
 $pdf->Ln(10);
 
-$pdf->SetFont('Arial', '', 12);
-$pdf->Cell(40, 10, iconv('UTF-8', 'ISO-8859-9//TRANSLIT', 'Yolcu Adi:'), 0, 0);
-$pdf->Cell(0, 10, iconv('UTF-8', 'ISO-8859-9//TRANSLIT', $ticket['user_name']), 0, 1);
+$pdf->SetFont('DejaVu', '', 12);
+$pdf->Cell(40, 10, 'Yolcu Adı:', 0, 0);
+$pdf->Cell(0, 10, $ticket['user_name'], 0, 1);
 
-$pdf->Cell(40, 10, iconv('UTF-8', 'ISO-8859-9//TRANSLIT', 'Kalkis:'), 0, 0);
-$pdf->Cell(0, 10, iconv('UTF-8', 'ISO-8859-9//TRANSLIT', $ticket['departure_location']), 0, 1);
+$pdf->Cell(40, 10, 'Kalkış:', 0, 0);
+$pdf->Cell(0, 10, $ticket['departure_location'], 0, 1);
 
-$pdf->Cell(40, 10, iconv('UTF-8', 'ISO-8859-9//TRANSLIT', 'Varis:'), 0, 0);
-$pdf->Cell(0, 10, iconv('UTF-8', 'ISO-8859-9//TRANSLIT', $ticket['arrival_location']), 0, 1);
+$pdf->Cell(40, 10, 'Varış:', 0, 0);
+$pdf->Cell(0, 10, $ticket['arrival_location'], 0, 1);
 
-$pdf->Cell(40, 10, iconv('UTF-8', 'ISO-8859-9//TRANSLIT', 'Kalkis Saati:'), 0, 0);
+$pdf->Cell(40, 10, 'Kalkış Saati:', 0, 0);
 $pdf->Cell(0, 10, date('d.m.Y H:i', strtotime($ticket['departure_time'])), 0, 1);
 
-$pdf->Cell(40, 10, iconv('UTF-8', 'ISO-8859-9//TRANSLIT', 'Koltuk No:'), 0, 0);
+$pdf->Cell(40, 10, 'Koltuk No:', 0, 0);
 $pdf->Cell(0, 10, $ticket['seat_number'], 0, 1);
 
-$pdf->SetFont('Arial', 'B', 12);
-$pdf->Cell(40, 10, iconv('UTF-8', 'ISO-8859-9//TRANSLIT', 'Fiyat:'), 0, 0);
+$pdf->SetFont('DejaVu', 'B', 12);
+$pdf->Cell(40, 10, 'Fiyat:', 0, 0);
 $pdf->Cell(0, 10, $ticket['price'] . ' TL', 0, 1);
 
 // PDF'i tarayıcıya gönder
