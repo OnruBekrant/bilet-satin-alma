@@ -96,3 +96,60 @@ else if ($action == 'delete_trip' && isset($_GET['trip_id'])) {
         exit();
     }
 }
+// Sefer güncelleme eylemi
+else if ($action == 'edit_trip' && $_SERVER['REQUEST_METHOD'] == 'POST') {
+    // Formdan gelen verileri al
+    $trip_id = $_POST['trip_id'];
+    $departure_location = trim($_POST['departure_location']);
+    $arrival_location = trim($_POST['arrival_location']);
+    $departure_date = $_POST['departure_date'];
+    $departure_time = $_POST['departure_time'];
+    $arrival_date = $_POST['arrival_date'];
+    $arrival_time = $_POST['arrival_time'];
+    $seat_count = filter_input(INPUT_POST, 'seat_count', FILTER_VALIDATE_INT);
+    $price = filter_input(INPUT_POST, 'price', FILTER_VALIDATE_FLOAT);
+
+    $company_id = $_SESSION['company_id'];
+
+    // Tarih ve saat verilerini birleştir
+    $departure_datetime = $departure_date . ' ' . $departure_time;
+    $arrival_datetime = $arrival_date . ' ' . $arrival_time;
+
+    // Basit doğrulama
+    if (empty($departure_location) || empty($arrival_location) || !$seat_count || !$price || !$trip_id) {
+        die('Lütfen tüm alanları doğru bir şekilde doldurun.');
+    }
+
+    try {
+        // GÜVENLİK KONTROLÜ: Admin'in güncellemeye çalıştığı sefer gerçekten kendi firmasına mı ait?
+        // Bu kontrolü UPDATE sorgusunun WHERE kısmına company_id ekleyerek de yapabiliriz.
+
+        $stmt = $pdo->prepare(
+            "UPDATE trips SET 
+                departure_location = ?,
+                arrival_location = ?,
+                departure_time = ?,
+                arrival_time = ?,
+                seat_count = ?,
+                price = ?
+            WHERE id = ? AND company_id = ?"
+        );
+        $stmt->execute([
+            $departure_location,
+            $arrival_location,
+            $departure_datetime,
+            $arrival_datetime,
+            $seat_count,
+            $price,
+            $trip_id,
+            $company_id // Güvenlik için company_id kontrolü
+        ]);
+
+        // Başarılı güncelleme sonrası admin paneline yönlendir
+        header("Location: /index.php?page=company_admin_panel&status=trip_updated");
+        exit();
+
+    } catch (PDOException $e) {
+        die("Veritabanı hatası: " . $e->getMessage());
+    }
+}

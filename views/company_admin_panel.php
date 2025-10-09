@@ -57,6 +57,11 @@ $company_trips = $stmt->fetchAll();
         Sefer başarıyla silindi!
     </div>
 <?php endif; ?>
+<?php if (isset($_GET['status']) && $_GET['status'] == 'trip_updated'): ?>
+    <div style="color: #155724; background-color: #d4edda; padding: 1rem; border-radius: .25rem; margin-bottom: 1rem;">
+        Sefer başarıyla güncellendi!
+    </div>
+<?php endif; ?>
 
 <?php if (isset($_GET['error'])): ?>
     <div style="color: #721c24; background-color: #f8d7da; padding: 1rem; border-radius: .25rem; margin-bottom: 1rem;">
@@ -92,7 +97,7 @@ $company_trips = $stmt->fetchAll();
                             <td><?php echo htmlspecialchars($trip['seat_count']); ?></td>
                             <td><?php echo htmlspecialchars($trip['price']); ?> TL</td>
                             <td>
-                                <a href="#" class="btn btn-warning">Düzenle</a>
+                                <a href="/index.php?page=edit_trip&trip_id=<?php echo $trip['id']; ?>" class="btn btn-warning">Düzenle</a>
                                 <a href="/index.php?action=delete_trip&trip_id=<?php echo $trip['id']; ?>" class="btn btn-danger" onclick="return confirm('Bu seferi ve ilişkili tüm biletleri kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.');">Sil</a>
                             </td>
                         </tr>
