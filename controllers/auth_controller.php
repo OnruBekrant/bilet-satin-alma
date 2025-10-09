@@ -38,7 +38,7 @@ if ($action == 'register' && $_SERVER['REQUEST_METHOD'] == 'POST') {
         die("Kayıt sırasında bir hata oluştu: " . $e->getMessage());
     }
 }
-// --- Kullanıcı Giriş İşlemi ---
+// --- Kullanıcı Giriş İşlemi (GÜNCELLENMİŞ HALİ) ---
 else if ($action == 'login' && $_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = trim($_POST['email']);
     $password = $_POST['password'];
@@ -54,12 +54,24 @@ else if ($action == 'login' && $_SERVER['REQUEST_METHOD'] == 'POST') {
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['password'])) {
+            // Şifre doğru. Oturum (session) bilgilerini ayarla.
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['name'];
             $_SESSION['user_role'] = $user['role'];
+            
+            // Eğer kullanıcı bir firma admini ise, firma ID'sini de session'a ekle.
+            if ($user['role'] === 'firma_admin') {
+                $_SESSION['company_id'] = $user['company_id'];
+            }
 
-            header("Location: /index.php?page=home");
+            // Kullanıcıyı rolüne göre doğru sayfaya yönlendir.
+            if ($user['role'] === 'firma_admin') {
+                header("Location: /index.php?page=company_admin_panel");
+            } else {
+                header("Location: /index.php?page=home");
+            }
             exit();
+
         } else {
             header("Location: /index.php?page=login&error=E-posta veya şifre hatalı!");
             exit();
