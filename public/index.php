@@ -18,9 +18,9 @@ if (isset($_GET['action'])) {
         require_once __DIR__ . '/../controllers/ticket_controller.php';
     } elseif ($action === 'download_pdf') {
         require_once __DIR__ . '/../controllers/pdf_controller.php';
-    } elseif ($action === 'add_trip') { 
-        require_once __DIR__ . '/../controllers/trip_controller.php';
-    }
+    } elseif (in_array($action, ['add_trip', 'delete_trip'])) {
+    require_once __DIR__ . '/../controllers/trip_controller.php';
+}
 }
 
 $page = $_GET['page'] ?? 'home';

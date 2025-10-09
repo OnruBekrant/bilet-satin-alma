@@ -57,3 +57,42 @@ if ($action == 'add_trip' && $_SERVER['REQUEST_METHOD'] == 'POST') {
         die("Veritabanı hatası: " . $e->getMessage());
     }
 }
+// Yeni sefer silme eylemi
+else if ($action == 'delete_trip' && isset($_GET['trip_id'])) {
+    $trip_id = $_GET['trip_id'];
+    $company_id = $_SESSION['company_id'];
+
+    try {
+        // Transaction başlat
+        $pdo->beginTransaction();
+
+        // GÜVENLİK KONTROLÜ: Admin'in silmeye çalıştığı sefer gerçekten kendi firmasına mı ait?
+        $stmt_check = $pdo->prepare("SELECT id FROM trips WHERE id = ? AND company_id = ?");
+        $stmt_check->execute([$trip_id, $company_id]);
+        if ($stmt_check->fetch() === false) {
+            // Eğer sefer bu firmaya ait değilse, yetkisiz işlem hatası ver.
+            throw new Exception("Bu seferi silme yetkiniz yok.");
+        }
+
+        // Önce bu sefere ait satılmış biletleri (varsa) 'tickets' tablosundan sil.
+        // Bu, veritabanında "yetim" kayıt kalmasını önler.
+        $stmt_delete_tickets = $pdo->prepare("DELETE FROM tickets WHERE trip_id = ?");
+        $stmt_delete_tickets->execute([$trip_id]);
+
+        // Şimdi seferin kendisini 'trips' tablosundan sil.
+        $stmt_delete_trip = $pdo->prepare("DELETE FROM trips WHERE id = ?");
+        $stmt_delete_trip->execute([$trip_id]);
+
+        // Her şey yolundaysa, değişiklikleri onayla.
+        $pdo->commit();
+
+        header("Location: /index.php?page=company_admin_panel&status=trip_deleted");
+        exit();
+
+    } catch (Exception $e) {
+        // Herhangi bir hata olursa, tüm işlemleri geri al.
+        $pdo->rollBack();
+        header("Location: /index.php?page=company_admin_panel&error=" . urlencode($e->getMessage()));
+        exit();
+    }
+}
