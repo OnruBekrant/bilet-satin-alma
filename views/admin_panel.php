@@ -43,6 +43,17 @@ $companies = $pdo->query("SELECT * FROM companies ORDER BY name")->fetchAll();
     <div class="container">
         <div class="section">
             <h2>Firma Yönetimi</h2>
+            <?php if (isset($_GET['status']) && $_GET['status'] == 'company_deleted'): ?>
+    <div style="color: #155724; background-color: #d4edda; padding: 1rem; border-radius: .25rem; margin-bottom: 1rem;">
+        Firma ve ilişkili tüm verileri başarıyla silindi!
+    </div>
+<?php endif; ?>
+
+<?php if (isset($_GET['error'])): ?>
+    <div style="color: #721c24; background-color: #f8d7da; padding: 1rem; border-radius: .25rem; margin-bottom: 1rem;">
+        Hata: <?php echo htmlspecialchars($_GET['error']); ?>
+    </div>
+<?php endif; ?>
             <form action="/index.php?action=add_company" method="POST" class="form-inline">
                 <input type="text" name="company_name" placeholder="Yeni Firma Adı" required>
                 <button type="submit" class="btn btn-primary">Firma Ekle</button>
@@ -55,7 +66,7 @@ $companies = $pdo->query("SELECT * FROM companies ORDER BY name")->fetchAll();
                         <tr>
                             <td><?php echo htmlspecialchars($company['id']); ?></td>
                             <td><?php echo htmlspecialchars($company['name']); ?></td>
-                            <td><a href="#" class="btn btn-danger">Sil</a></td>
+                            <td><a href="/index.php?action=delete_company&company_id=<?php echo $company['id']; ?>" class="btn btn-danger" onclick="return confirm('Bu firmayı silmek istediğinizden emin misiniz? Bu firmaya ait TÜM seferler ve biletler kalıcı olarak silinecektir!');">Sil</a></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
