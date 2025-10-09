@@ -64,8 +64,12 @@ else if ($action == 'login' && $_SERVER['REQUEST_METHOD'] == 'POST') {
                 $_SESSION['company_id'] = $user['company_id'];
             }
 
-            // Kullanıcıyı rolüne göre doğru sayfaya yönlendir.
-            if ($user['role'] === 'firma_admin') {
+            // ###############################################################
+            // ### DEĞİŞİKLİK BURADA: 3 ROLÜ DE KONTROL EDEN YÖNLENDİRME ###
+            // ###############################################################
+            if ($user['role'] === 'admin') {
+                header("Location: /index.php?page=admin_panel");
+            } elseif ($user['role'] === 'firma_admin') {
                 header("Location: /index.php?page=company_admin_panel");
             } else {
                 header("Location: /index.php?page=home");
@@ -77,7 +81,7 @@ else if ($action == 'login' && $_SERVER['REQUEST_METHOD'] == 'POST') {
             exit();
         }
     } catch (PDOException $e) {
-        die("Giriş sırasında bir veritabanı hatası oluştu: " . $e->getMessage());
+        die("Giriş sırasında bir veritabanı hatası oluştu: ". $e->getMessage());
     }
 }
 // --- Kullanıcı Çıkış İşlemi ---
