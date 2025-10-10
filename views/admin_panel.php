@@ -7,17 +7,22 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
 
 require_once __DIR__ . '/../config/database.php';
 
-// Tüm firmaları veritabanından çek
+// Firma ekleme formundaki dropdown için tüm firmaları çek
 $companies = $pdo->query("SELECT * FROM companies ORDER BY name")->fetchAll();
+
 // Mevcut firma adminlerini ve atandıkları firmaları listelemek için JOIN'li sorgu
-$stmt = $pdo->query(
+$stmt_admins = $pdo->query(
     "SELECT u.id, u.name, u.email, c.name as company_name 
      FROM users u 
      LEFT JOIN companies c ON u.company_id = c.id 
      WHERE u.role = 'firma_admin'
      ORDER BY u.name"
 );
-$company_admins = $stmt->fetchAll();
+$company_admins = $stmt_admins->fetchAll();
+
+// Sadece genel kuponları (company_id'si NULL olanlar) çek
+$stmt_global_coupons = $pdo->query("SELECT * FROM coupons WHERE company_id IS NULL ORDER BY expire_date DESC");
+$global_coupons = $stmt_global_coupons->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="tr">
@@ -33,11 +38,14 @@ $company_admins = $stmt->fetchAll();
         table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
         th, td { border: 1px solid #dee2e6; padding: 0.75rem; text-align: left; }
         th { background-color: #e9ecef; }
-        .form-inline { display: flex; gap: 1rem; align-items: center; }
-        .form-inline input { padding: .5rem; border: 1px solid #ced4da; border-radius: 4px; }
+        .form-inline { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+        .form-inline input, .form-inline select { padding: .5rem; border: 1px solid #ced4da; border-radius: 4px; }
         .btn { text-decoration: none; padding: 0.5rem 1rem; border-radius: 4px; color: white; border: none; cursor: pointer; }
         .btn-primary { background-color: #007bff; }
         .btn-danger { background-color: #dc3545; }
+        .alert { padding: 1rem; border-radius: .25rem; margin-bottom: 1rem; border: 1px solid transparent; }
+        .alert-success { color: #155724; background-color: #d4edda; border-color: #c3e6cb; }
+        .alert-danger { color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; }
     </style>
 </head>
 <body>
@@ -50,29 +58,28 @@ $company_admins = $stmt->fetchAll();
     </nav>
 
     <div class="container">
+        <?php if (isset($_GET['status']) && $_GET['status'] == 'company_deleted'): ?>
+            <div class="alert alert-success">Firma ve ilişkili tüm verileri başarıyla silindi!</div>
+        <?php endif; ?>
+        <?php if (isset($_GET['status']) && $_GET['status'] == 'company_admin_added'): ?>
+            <div class="alert alert-success">Yeni Firma Admin kullanıcısı başarıyla eklendi!</div>
+        <?php endif; ?>
+        <?php if (isset($_GET['status']) && $_GET['status'] == 'global_coupon_added'): ?>
+            <div class="alert alert-success">Yeni genel kupon başarıyla eklendi!</div>
+        <?php endif; ?>
+        <?php if (isset($_GET['status']) && $_GET['status'] == 'global_coupon_deleted'): // YENİ EKLENEN BLOK ?>
+            <div class="alert alert-success">Genel kupon başarıyla silindi!</div>
+        <?php endif; ?>
+        <?php if (isset($_GET['error'])): ?>
+            <div class="alert alert-danger">Hata: <?php echo htmlspecialchars($_GET['error']); ?></div>
+        <?php endif; ?>
+
         <div class="section">
             <h2>Firma Yönetimi</h2>
-            <?php if (isset($_GET['status']) && $_GET['status'] == 'company_deleted'): ?>
-    <div style="color: #155724; background-color: #d4edda; padding: 1rem; border-radius: .25rem; margin-bottom: 1rem;">
-        Firma ve ilişkili tüm verileri başarıyla silindi!
-    </div>
-<?php endif; ?>
-<?php if (isset($_GET['status']) && $_GET['status'] == 'company_admin_added'): // YENİ EKLENEN BLOK ?>
-    <div style="color: #155724; background-color: #d4edda; padding: 1rem; border-radius: .25rem; margin-bottom: 1rem;">
-        Yeni Firma Admin kullanıcısı başarıyla eklendi!
-    </div>
-<?php endif; ?>
-
-<?php if (isset($_GET['error'])): ?>
-    <div style="color: #721c24; background-color: #f8d7da; padding: 1rem; border-radius: .25rem; margin-bottom: 1rem;">
-        Hata: <?php echo htmlspecialchars($_GET['error']); ?>
-    </div>
-<?php endif; ?>
             <form action="/index.php?action=add_company" method="POST" class="form-inline">
                 <input type="text" name="company_name" placeholder="Yeni Firma Adı" required>
                 <button type="submit" class="btn btn-primary">Firma Ekle</button>
             </form>
-
             <table>
                 <thead><tr><th>ID</th><th>Firma Adı</th><th>İşlemler</th></tr></thead>
                 <tbody>
@@ -87,38 +94,23 @@ $company_admins = $stmt->fetchAll();
             </table>
         </div>
         <hr>
-        </div>
-        <hr>
 
         <div class="section">
             <h2>Firma Admin Yönetimi</h2>
-            <form action="/index.php?action=add_company_admin" method="POST" class="form-inline" style="flex-wrap: wrap;">
+            <form action="/index.php?action=add_company_admin" method="POST" class="form-inline">
                 <input type="text" name="name" placeholder="Ad Soyad" required>
                 <input type="email" name="email" placeholder="E-posta" required>
                 <input type="password" name="password" placeholder="Şifre" required>
-
                 <select name="company_id" required>
                     <option value="">Firma Seçin...</option>
                     <?php foreach ($companies as $company): ?>
-                        <option value="<?php echo $company['id']; ?>">
-                            <?php echo htmlspecialchars($company['name']); ?>
-                        </option>
+                        <option value="<?php echo $company['id']; ?>"><?php echo htmlspecialchars($company['name']); ?></option>
                     <?php endforeach; ?>
                 </select>
-
                 <button type="submit" class="btn btn-primary">Firma Admin Ekle</button>
             </form>
-
             <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Ad Soyad</th>
-                        <th>E-posta</th>
-                        <th>Atandığı Firma</th>
-                        <th>İşlemler</th>
-                    </tr>
-                </thead>
+                <thead><tr><th>ID</th><th>Ad Soyad</th><th>E-posta</th><th>Atandığı Firma</th><th>İşlemler</th></tr></thead>
                 <tbody>
                     <?php foreach ($company_admins as $admin): ?>
                         <tr>
@@ -126,16 +118,39 @@ $company_admins = $stmt->fetchAll();
                             <td><?php echo htmlspecialchars($admin['name']); ?></td>
                             <td><?php echo htmlspecialchars($admin['email']); ?></td>
                             <td><?php echo htmlspecialchars($admin['company_name'] ?? 'Atanmamış'); ?></td>
-                            <td><a href="#" class="btn btn-danger">Sil</a></td>
+                            <td><a href="/index.php?action=delete_global_coupon&coupon_id=<?php echo $coupon['id']; ?>" class="btn btn-danger" onclick="return confirm('Bu genel kuponu kalıcı olarak silmek istediğinizden emin misiniz?');">Sil</a></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
         <hr>
+
+        <div class="section">
+            <h2>Genel Kupon Yönetimi (Tüm Firmalarda Geçerli)</h2>
+            <form action="/index.php?action=add_global_coupon" method="POST" class="form-inline">
+                <input type="text" name="code" placeholder="Kupon Kodu" required>
+                <input type="number" name="discount_rate" placeholder="İndirim Oranı (%)" min="1" max="100" required>
+                <input type="number" name="usage_limit" placeholder="Kullanım Limiti" min="1" required>
+                <input type="date" name="expire_date" required>
+                <button type="submit" class="btn btn-primary">Genel Kupon Ekle</button>
+            </form>
+            <table>
+                <thead><tr><th>ID</th><th>Kod</th><th>İndirim (%)</th><th>Limit</th><th>Son Tarih</th><th>İşlemler</th></tr></thead>
+                <tbody>
+                    <?php foreach ($global_coupons as $coupon): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($coupon['id']); ?></td>
+                            <td><?php echo htmlspecialchars($coupon['code']); ?></td>
+                            <td><?php echo htmlspecialchars($coupon['discount_rate']); ?></td>
+                            <td><?php echo htmlspecialchars($coupon['usage_limit']); ?></td>
+                            <td><?php echo date('d.m.Y', strtotime($coupon['expire_date'])); ?></td>
+                            <td><a href="#" class="btn btn-danger">Sil</a></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
-</body>
-</html>
-        </div>
+    </div>
 </body>
 </html>

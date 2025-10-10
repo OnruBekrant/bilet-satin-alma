@@ -99,3 +99,52 @@ else if ($action == 'add_company_admin' && $_SERVER['REQUEST_METHOD'] == 'POST')
         exit();
     }
 }
+// Süper Admin için genel kupon ekleme eylemi
+else if ($action == 'add_global_coupon' && $_SERVER['REQUEST_METHOD'] == 'POST') {
+    $code = trim($_POST['code']);
+    $discount_rate = filter_input(INPUT_POST, 'discount_rate', FILTER_VALIDATE_INT);
+    $usage_limit = filter_input(INPUT_POST, 'usage_limit', FILTER_VALIDATE_INT);
+    $expire_date = $_POST['expire_date'];
+
+    // company_id'yi NULL olarak ayarlıyoruz, bu onun genel bir kupon olduğunu belirtir.
+    $company_id = null; 
+
+    if (empty($code) || !$discount_rate || !$usage_limit || empty($expire_date)) {
+        header("Location: /index.php?page=admin_panel&error=" . urlencode("Lütfen kupon için tüm alanları doldurun."));
+        exit();
+    }
+
+    try {
+        $stmt = $pdo->prepare(
+            "INSERT INTO coupons (code, discount_rate, usage_limit, expire_date, company_id) 
+             VALUES (?, ?, ?, ?, ?)"
+        );
+        $stmt->execute([$code, $discount_rate, $usage_limit, $expire_date, $company_id]);
+
+        header("Location: /index.php?page=admin_panel&status=global_coupon_added");
+        exit();
+    } catch (PDOException $e) {
+        header("Location: /index.php?page=admin_panel&error=" . urlencode("Veritabanı hatası veya bu kod zaten mevcut."));
+        exit();
+    }
+}
+else if ($action == 'delete_global_coupon' && isset($_GET['coupon_id'])) {
+    $coupon_id = $_GET['coupon_id'];
+
+    try {
+        // GÜVENLİK KONTROLÜ: Silinmek istenen kuponun genel bir kupon olduğundan emin ol (company_id IS NULL).
+        $stmt = $pdo->prepare("DELETE FROM coupons WHERE id = ? AND company_id IS NULL");
+        $stmt->execute([$coupon_id]);
+
+        if ($stmt->rowCount() === 0) {
+            throw new Exception("Genel kupon bulunamadı veya silme yetkiniz yok.");
+        }
+
+        header("Location: /index.php?page=admin_panel&status=global_coupon_deleted");
+        exit();
+
+    } catch (Exception $e) {
+        header("Location: /index.php?page=admin_panel&error=" . urlencode($e->getMessage()));
+        exit();
+    }
+}

@@ -18,11 +18,11 @@ if (isset($_GET['action'])) {
         require_once __DIR__ . '/../controllers/ticket_controller.php';
     } elseif ($action === 'download_pdf') {
         require_once __DIR__ . '/../controllers/pdf_controller.php';
-    } elseif (in_array($action, ['add_trip', 'delete_trip', 'edit_trip'])) {
-    require_once __DIR__ . '/../controllers/trip_controller.php';
-    } elseif (in_array($action, ['add_trip', 'delete_trip', 'edit_trip', 'add_company_coupon', 'delete_company_coupon'])) { // GÜNCELLE
-    require_once __DIR__ . '/../controllers/trip_controller.php';
-} 
+    } elseif (in_array($action, ['add_trip', 'delete_trip', 'edit_trip', 'add_company_coupon', 'delete_company_coupon'])) {
+        require_once __DIR__ . '/../controllers/trip_controller.php';
+    } elseif (in_array($action, ['add_company', 'delete_company', 'add_company_admin', 'add_global_coupon', 'delete_global_coupon'])) {
+    require_once __DIR__ . '/../controllers/admin_controller.php';
+}
 }
 
 $page = $_GET['page'] ?? 'home';
@@ -33,8 +33,6 @@ if (in_array($page, $allowed_pages) && file_exists(__DIR__ . "/../views/{$page}.
 } elseif ($page === 'home' && file_exists(__DIR__ . "/../views/home.php")) {
     require_once __DIR__ . "/../views/home.php";
 } else {
-    // Eğer hiçbir sayfa eşleşmiyorsa ve bir action da çalışmadıysa, 404 ver.
-    // Bu kontrol, sadece action olan ama sayfa göstermeyen (örn: download_pdf) isteklerin 404 vermesini engeller.
     if (!isset($_GET['action'])) {
         http_response_code(404);
         echo "<h1>404 Sayfa Bulunamadı</h1>";
