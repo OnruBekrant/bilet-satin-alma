@@ -20,7 +20,7 @@ if (isset($_GET['action'])) {
         require_once __DIR__ . '/../controllers/pdf_controller.php';
     } elseif (in_array($action, ['add_trip', 'delete_trip', 'edit_trip', 'add_company_coupon', 'delete_company_coupon'])) {
         require_once __DIR__ . '/../controllers/trip_controller.php';
-    } elseif (in_array($action, ['add_company', 'delete_company', 'add_company_admin', 'add_global_coupon', 'delete_global_coupon'])) {
+    } elseif (in_array($action, ['add_company', 'delete_company', 'add_company_admin', 'add_global_coupon', 'delete_global_coupon', 'delete_company_admin'])) {
     require_once __DIR__ . '/../controllers/admin_controller.php';
 }
 }

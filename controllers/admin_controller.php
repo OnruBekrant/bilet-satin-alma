@@ -148,3 +148,24 @@ else if ($action == 'delete_global_coupon' && isset($_GET['coupon_id'])) {
         exit();
     }
 }
+// Süper Admin için Firma Admin kullanıcısı silme eylemi
+else if ($action == 'delete_company_admin' && isset($_GET['user_id'])) {
+    $user_id_to_delete = $_GET['user_id'];
+
+    try {
+        // Güvenlik olarak, sadece rolü 'firma_admin' olan kullanıcıların silinebildiğinden emin olalım.
+        $stmt = $pdo->prepare("DELETE FROM users WHERE id = ? AND role = 'firma_admin'");
+        $stmt->execute([$user_id_to_delete]);
+
+        if ($stmt->rowCount() === 0) {
+            throw new Exception("Firma admini bulunamadı veya bu kullanıcıyı silme yetkiniz yok.");
+        }
+
+        header("Location: /index.php?page=admin_panel&status=company_admin_deleted");
+        exit();
+
+    } catch (Exception $e) {
+        header("Location: /index.php?page=admin_panel&error=" . urlencode($e->getMessage()));
+        exit();
+    }
+}

@@ -70,6 +70,9 @@ $global_coupons = $stmt_global_coupons->fetchAll();
         <?php if (isset($_GET['status']) && $_GET['status'] == 'global_coupon_deleted'): // YENİ EKLENEN BLOK ?>
             <div class="alert alert-success">Genel kupon başarıyla silindi!</div>
         <?php endif; ?>
+        <?php if (isset($_GET['status']) && $_GET['status'] == 'company_admin_deleted'): // YENİ EKLENEN BLOK ?>
+        <div class="alert alert-success">Firma Admin kullanıcısı başarıyla silindi!</div>
+        <?php endif; ?>
         <?php if (isset($_GET['error'])): ?>
             <div class="alert alert-danger">Hata: <?php echo htmlspecialchars($_GET['error']); ?></div>
         <?php endif; ?>
