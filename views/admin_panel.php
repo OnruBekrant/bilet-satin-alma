@@ -145,7 +145,9 @@ $global_coupons = $stmt_global_coupons->fetchAll();
                             <td><?php echo htmlspecialchars($coupon['discount_rate']); ?></td>
                             <td><?php echo htmlspecialchars($coupon['usage_limit']); ?></td>
                             <td><?php echo date('d.m.Y', strtotime($coupon['expire_date'])); ?></td>
-                            <td><a href="#" class="btn btn-danger">Sil</a></td>
+                            <td>
+                            <a href="/index.php?action=delete_global_coupon&coupon_id=<?php echo $coupon['id']; ?>" class="btn btn-danger" onclick="return confirm('Bu genel kuponu kalıcı olarak silmek istediğinizden emin misiniz?');">Sil</a>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
