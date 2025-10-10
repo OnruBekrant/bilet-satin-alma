@@ -121,7 +121,7 @@ $global_coupons = $stmt_global_coupons->fetchAll();
                             <td><?php echo htmlspecialchars($admin['name']); ?></td>
                             <td><?php echo htmlspecialchars($admin['email']); ?></td>
                             <td><?php echo htmlspecialchars($admin['company_name'] ?? 'Atanmamış'); ?></td>
-                            <td><a href="/index.php?action=delete_global_coupon&coupon_id=<?php echo $coupon['id']; ?>" class="btn btn-danger" onclick="return confirm('Bu genel kuponu kalıcı olarak silmek istediğinizden emin misiniz?');">Sil</a></td>
+                            <td><a href="/index.php?action=delete_company_admin&user_id=<?php echo $admin['id']; ?>" class="btn btn-danger" onclick="return confirm('Bu firma admini kullanıcısını kalıcı olarak silmek istediğinizden emin misiniz?');">Sil</a></td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
