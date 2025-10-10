@@ -60,3 +60,42 @@ else if ($action == 'delete_company' && isset($_GET['company_id'])) {
         exit();
     }
 }
+else if ($action == 'add_company_admin' && $_SERVER['REQUEST_METHOD'] == 'POST') {
+    $name = trim($_POST['name']);
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
+    $company_id = $_POST['company_id'];
+    $role = 'firma_admin'; // Rolü doğrudan 'firma_admin' olarak ayarlıyoruz.
+
+    // Basit doğrulama
+    if (empty($name) || empty($email) || empty($password) || empty($company_id)) {
+        header("Location: /index.php?page=admin_panel&error=" . urlencode("Lütfen tüm alanları doldurun."));
+        exit();
+    }
+
+    // E-postanın zaten kayıtlı olup olmadığını kontrol et
+    $stmt_check = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+    $stmt_check->execute([$email]);
+    if ($stmt_check->fetch()) {
+        header("Location: /index.php?page=admin_panel&error=" . urlencode("Bu e-posta adresi zaten kayıtlı."));
+        exit();
+    }
+
+    // Şifreyi hash'le
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+    try {
+        // Veritabanına yeni kullanıcıyı ekle
+        $stmt = $pdo->prepare(
+            "INSERT INTO users (name, email, password, role, company_id) VALUES (?, ?, ?, ?, ?)"
+        );
+        $stmt->execute([$name, $email, $hashed_password, $role, $company_id]);
+
+        header("Location: /index.php?page=admin_panel&status=company_admin_added");
+        exit();
+
+    } catch (PDOException $e) {
+        header("Location: /index.php?page=admin_panel&error=" . urlencode("Veritabanı hatası: " . $e->getMessage()));
+        exit();
+    }
+}

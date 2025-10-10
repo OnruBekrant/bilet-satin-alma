@@ -9,6 +9,15 @@ require_once __DIR__ . '/../config/database.php';
 
 // Tüm firmaları veritabanından çek
 $companies = $pdo->query("SELECT * FROM companies ORDER BY name")->fetchAll();
+// Mevcut firma adminlerini ve atandıkları firmaları listelemek için JOIN'li sorgu
+$stmt = $pdo->query(
+    "SELECT u.id, u.name, u.email, c.name as company_name 
+     FROM users u 
+     LEFT JOIN companies c ON u.company_id = c.id 
+     WHERE u.role = 'firma_admin'
+     ORDER BY u.name"
+);
+$company_admins = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="tr">
@@ -48,6 +57,11 @@ $companies = $pdo->query("SELECT * FROM companies ORDER BY name")->fetchAll();
         Firma ve ilişkili tüm verileri başarıyla silindi!
     </div>
 <?php endif; ?>
+<?php if (isset($_GET['status']) && $_GET['status'] == 'company_admin_added'): // YENİ EKLENEN BLOK ?>
+    <div style="color: #155724; background-color: #d4edda; padding: 1rem; border-radius: .25rem; margin-bottom: 1rem;">
+        Yeni Firma Admin kullanıcısı başarıyla eklendi!
+    </div>
+<?php endif; ?>
 
 <?php if (isset($_GET['error'])): ?>
     <div style="color: #721c24; background-color: #f8d7da; padding: 1rem; border-radius: .25rem; margin-bottom: 1rem;">
@@ -73,6 +87,55 @@ $companies = $pdo->query("SELECT * FROM companies ORDER BY name")->fetchAll();
             </table>
         </div>
         <hr>
+        </div>
+        <hr>
+
+        <div class="section">
+            <h2>Firma Admin Yönetimi</h2>
+            <form action="/index.php?action=add_company_admin" method="POST" class="form-inline" style="flex-wrap: wrap;">
+                <input type="text" name="name" placeholder="Ad Soyad" required>
+                <input type="email" name="email" placeholder="E-posta" required>
+                <input type="password" name="password" placeholder="Şifre" required>
+
+                <select name="company_id" required>
+                    <option value="">Firma Seçin...</option>
+                    <?php foreach ($companies as $company): ?>
+                        <option value="<?php echo $company['id']; ?>">
+                            <?php echo htmlspecialchars($company['name']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+
+                <button type="submit" class="btn btn-primary">Firma Admin Ekle</button>
+            </form>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Ad Soyad</th>
+                        <th>E-posta</th>
+                        <th>Atandığı Firma</th>
+                        <th>İşlemler</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($company_admins as $admin): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($admin['id']); ?></td>
+                            <td><?php echo htmlspecialchars($admin['name']); ?></td>
+                            <td><?php echo htmlspecialchars($admin['email']); ?></td>
+                            <td><?php echo htmlspecialchars($admin['company_name'] ?? 'Atanmamış'); ?></td>
+                            <td><a href="#" class="btn btn-danger">Sil</a></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <hr>
+        </div>
+</body>
+</html>
         </div>
 </body>
 </html>

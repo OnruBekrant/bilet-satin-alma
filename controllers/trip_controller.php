@@ -153,3 +153,53 @@ else if ($action == 'edit_trip' && $_SERVER['REQUEST_METHOD'] == 'POST') {
         die("Veritabanı hatası: " . $e->getMessage());
     }
 }
+else if ($action == 'add_company_coupon' && $_SERVER['REQUEST_METHOD'] == 'POST') {
+    $code = trim($_POST['code']);
+    $discount_rate = filter_input(INPUT_POST, 'discount_rate', FILTER_VALIDATE_INT);
+    $usage_limit = filter_input(INPUT_POST, 'usage_limit', FILTER_VALIDATE_INT);
+    $expire_date = $_POST['expire_date'];
+    $company_id = $_SESSION['company_id']; // Kuponu bu firmaya bağla
+
+    if (empty($code) || !$discount_rate || !$usage_limit || empty($expire_date)) {
+        header("Location: /index.php?page=company_admin_panel&error=" . urlencode("Lütfen kupon için tüm alanları doldurun."));
+        exit();
+    }
+
+    try {
+        $stmt = $pdo->prepare(
+            "INSERT INTO coupons (code, discount_rate, usage_limit, expire_date, company_id) 
+             VALUES (?, ?, ?, ?, ?)"
+        );
+        $stmt->execute([$code, $discount_rate, $usage_limit, $expire_date, $company_id]);
+
+        header("Location: /index.php?page=company_admin_panel&status=coupon_added");
+        exit();
+    } catch (PDOException $e) {
+        // Hata yönetimi (örn: aynı kodda kupon varsa)
+        header("Location: /index.php?page=company_admin_panel&error=" . urlencode("Veritabanı hatası veya bu kod zaten mevcut."));
+        exit();
+    }
+}
+else if ($action == 'delete_company_coupon' && isset($_GET['coupon_id'])) {
+    $coupon_id = $_GET['coupon_id'];
+    $company_id = $_SESSION['company_id'];
+
+    try {
+        // GÜVENLİK KONTROLÜ: Silinmek istenen kupon gerçekten bu firmaya mı ait?
+        $stmt = $pdo->prepare("DELETE FROM coupons WHERE id = ? AND company_id = ?");
+        $stmt->execute([$coupon_id, $company_id]);
+
+        // rowCount(), sorgudan etkilenen satır sayısını verir. 
+        // Eğer 0 ise, ya kupon bulunamadı ya da başka bir firmaya aitti.
+        if ($stmt->rowCount() === 0) {
+            throw new Exception("Kupon bulunamadı veya silme yetkiniz yok.");
+        }
+
+        header("Location: /index.php?page=company_admin_panel&status=coupon_deleted");
+        exit();
+
+    } catch (Exception $e) {
+        header("Location: /index.php?page=company_admin_panel&error=" . urlencode($e->getMessage()));
+        exit();
+    }
+}
